@@ -4,7 +4,8 @@
     <p>Craft your unique adventure</p>
   </div>
 
-  <form [formGroup]="storyForm" class="story-form" (ngSubmit)="onSubmit()">
+  <form [formGroup]="storyForm" class="story-form" [class.story-form--submitting]="isSubmitting" (ngSubmit)="onSubmit()">
+
     <!-- Hero Section -->
     <div class="section hero-section">
       <div class="section-header">
@@ -139,13 +140,39 @@
           <span class="error-message" *ngIf="captchaError">{{ captchaError }}</span>
           <div class="captcha-code">
             {{ captchaCode }}
-            <button type="button" (click)="generateCaptcha()" style="margin-left:8px; vertical-align: middle;">🔄</button>
+            <button type="button" [disabled]="isSubmitting" (click)="generateCaptcha()" style="margin-left:8px; vertical-align: middle;">🔄</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Submit Button -->
-    <button type="submit" class="submit-btn">✨ Generate Story ✨</button>
+    <button type="submit" class="submit-btn" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Generating PDF...' : '✨ Generate Story ✨' }}
+    </button>
+
+    <span class="error-message" *ngIf="submitError">{{ submitError }}</span>
   </form>
+
+</div>
+
+<div class="loader-overlay" *ngIf="isSubmitting">
+  <div class="loader-content">
+    <div class="loader-spinner"></div>
+    <p>Generating your storybook PDF... {{ generationProgress }}%</p>
+    <div class="progress-track">
+      <div class="progress-fill" [style.width.%]="generationProgress"></div>
+    </div>
+  </div>
+</div>
+
+<div class="success-popup-backdrop" *ngIf="showSuccessPopup">
+  <div class="success-popup">
+    <h3>PDF Storybook Generated</h3>
+    <p>Your storybook PDF is ready.</p>
+    <div class="success-popup-actions">
+      <button type="button" class="submit-btn" (click)="downloadGeneratedPdf()">⬇️ Download PDF</button>
+      <button type="button" class="close-btn" (click)="closeSuccessPopup()">Close</button>
+    </div>
+  </div>
 </div>
